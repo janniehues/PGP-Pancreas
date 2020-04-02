@@ -34,10 +34,10 @@ container = []
 # selection by name
 part=['PDAC-PGP11']
 #only plots no distances
-plotOnly=False
+plotOnly=True
 # if plot at all
 plotit=True
-useSimpleD = False
+useSimpleD = True
 
 if plotOnly:
    plotit=True
@@ -177,7 +177,8 @@ for d in data:
 
                flattened_idx = []
                for ent in idx_list:
-                  flattened_idx.append(ent)
+                 flattened_idx.append(ent)
+               
                exclude=[]
                for ii in idx_list:
                   for i in range(ii[0],ii[1]+1,1):
@@ -187,6 +188,7 @@ for d in data:
                not_idx_list = []
                for ii in exclude:
                   multi = exclude.count(ii)
+                  # focus on the subannotations in the annotation
                   if multi > 1:
                      for jj in idx_list:
                         for ij in range(jj[0],jj[1]+1,1):
@@ -201,12 +203,14 @@ for d in data:
                   exclude.remove(ii)
                for ii in not_idx_list:
                   idx_list.remove(ii)
-                    
+                                   
                subannos = [an[i[0]:i[1]+1] for i in idx_list]
 
-               if 0 not in flattened_idx or (len(an)-1) not in flattened_idx:
-                  subann = [an[i] for i in range(len(an)) if i not in exclude]
-                  subannos.append(subann)
+               # if 0 not in flattened_idx or (len(an)-1) not in flattened_idx:
+
+               # add all the remaining points to one annotation
+               subann = [an[i] for i in range(len(an)) if i not in exclude]
+               subannos.append(subann)
                         
                   # subannos = [an[i:j] for i,j in
                   #             zip([0] + idx_list, idx_list +
