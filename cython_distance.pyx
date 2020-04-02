@@ -41,8 +41,8 @@ cpdef double calculateDistance((double,double) point, (double,double) ppoint, (d
         
     return distance
 
-def calculateSDistance(point,immuneCell):
-    
+cpdef double calculateSDistance((double,double) point,(double,double) immuneCell):
+    cdef double distance						  
     distance = ((immuneCell[0]-point[0])**2+(immuneCell[1]-point[1])**2)**0.5
     return distance
 
