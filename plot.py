@@ -10,13 +10,22 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use("Agg")
 
+
+################
+# start inputs
+################
+
+# outputdirectory for plots
+out_dir_plots = './outputs_true/' 
 try:
-   os.mkdir('./outputs_true/')
+   os.mkdir(out_dir_plots)
 except:
    pass
 
+# output directory for distance data
+out_dir ='/media/jan/LARA-02/PGP-pancreas-JAN/Projekt/distanceData/' 
 try:
-   os.mkdir('/media/jan/LARA-02/PGP-pancreas-JAN/Projekt/distanceData_trivial/')
+   os.mkdir(out_dir)
 except:
    pass
 
@@ -26,24 +35,29 @@ imm_ext='.data'
 #path to folder where anno data is stored
 anno_path ='/media/jan/LARA-02/PGP-pancreas-JAN/Projekt/AnnoData/'
 anno_ext='.csv'
-data = []
 
 # selection by number
 rang=[]
 container = []
 # selection by name
-part=['PDAC-PGP11']
+part=['PDAC-PGP20']
 #only plots no distances
-plotOnly=True
+plotOnly=False
 # if plot at all
 plotit=True
-useSimpleD = True
+useSimpleD = False
+
+#######################
+# end of inputs
+#######################
 
 if plotOnly:
    plotit=True
 if plotOnly:
    print("Only plotting")
-    
+
+data = []
+
 for f in os.listdir(data_path):
    f =data_path+f
    if f.endswith(imm_ext):
@@ -171,13 +185,6 @@ for d in data:
                   idx_list.append(ids)
                   # print(point)
             if idx_list:
-               # print("splitting")
-               # print(idx_list)
-               # print(an)
-
-               flattened_idx = []
-               for ent in idx_list:
-                 flattened_idx.append(ent)
                
                exclude=[]
                for ii in idx_list:
@@ -188,33 +195,39 @@ for d in data:
                not_idx_list = []
                for ii in exclude:
                   multi = exclude.count(ii)
-                  # focus on the subannotations in the annotation
+                  # focus on overlapping subannotations
                   if multi > 1:
                      for jj in idx_list:
                         for ij in range(jj[0],jj[1]+1,1):
                            if ij == ii:
-                              if ii not in not_exclude:
-                                 not_exclude.append(ii)
+                              # if ii not in not_exclude:
+                              #    not_exclude.append(ii)
                               if jj not in not_idx_list:
                                  not_idx_list.append(jj)
 
 
-               for ii in not_exclude:
-                  exclude.remove(ii)
+               # for ii in not_exclude:
+               #    exclude.remove(ii)
+               
                for ii in not_idx_list:
+                  for i in range(ii[0],ii[1]+1,1):
+                     try:
+                        exclude.remove(i)
+                     except ValueError:
+                        pass                  
                   idx_list.remove(ii)
                                    
                subannos = [an[i[0]:i[1]+1] for i in idx_list]
 
                # if 0 not in flattened_idx or (len(an)-1) not in flattened_idx:
 
-               # add all the remaining points to one annotation
+               # add all the remaining points as one annotation
                subann = [an[i] for i in range(len(an)) if i not in exclude]
                subannos.append(subann)
                         
-                  # subannos = [an[i:j] for i,j in
-                  #             zip([0] + idx_list, idx_list +
-                  #                 ([size] if idx_list[-1] != size else []))]
+               # subannos = [an[i:j] for i,j in
+               #             zip([0] + idx_list, idx_list +
+               #                 ([size] if idx_list[-1] != size else []))]
             else:
                subannos = [an]
          # # remove empty subannos
@@ -231,7 +244,7 @@ for d in data:
          ax.set_title(out_name)
          ax.set_xlim([xmin, xmax])
          ax.set_ylim([ymin, ymax])
-         plt.savefig('./outputs_true/'+out_name+'.pdf', format='pdf')
+         plt.savefig(out_dir_plots+out_name+'.pdf', format='pdf')
          plt.close(fig)
          plt.clf()
       print("Done plotting")
@@ -241,7 +254,7 @@ for d in data:
       # get min distance distribution
       print()
       print("Generate Distances")
-      fout = open("/media/jan/LARA-02/PGP-pancreas-JAN/Projekt/distanceData_trivial/"+out_name+".data","w")
+      fout = open(out_dir+out_name+".data","w")
       ncells = len(immuneCells)
       plain_points=[]
       for tanno in ttannos:
