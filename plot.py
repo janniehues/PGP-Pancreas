@@ -183,9 +183,7 @@ for d in data:
                   ids = [i for i, e in enumerate(an) if e == point]
                   included_points.append(point)
                   idx_list.append(ids)
-                  # print(point)
-            if idx_list:
-               
+            if idx_list:               
                exclude=[]
                for ii in idx_list:
                   for i in range(ii[0],ii[1]+1,1):
@@ -200,14 +198,8 @@ for d in data:
                      for jj in idx_list:
                         for ij in range(jj[0],jj[1]+1,1):
                            if ij == ii:
-                              # if ii not in not_exclude:
-                              #    not_exclude.append(ii)
                               if jj not in not_idx_list:
                                  not_idx_list.append(jj)
-
-
-               # for ii in not_exclude:
-               #    exclude.remove(ii)
                
                for ii in not_idx_list:
                   for i in range(ii[0],ii[1]+1,1):
@@ -218,8 +210,6 @@ for d in data:
                   idx_list.remove(ii)
                                    
                subannos = [an[i[0]:i[1]+1] for i in idx_list]
-
-               # if 0 not in flattened_idx or (len(an)-1) not in flattened_idx:
 
                # add all the remaining points as one annotation
                subann = [an[i] for i in range(len(an)) if i not in exclude]
