@@ -37,10 +37,10 @@ anno_path ='/media/jan/LARA-02/PGP-pancreas-JAN/Projekt/AnnoData/'
 anno_ext='.csv'
 
 # selection by number
-rang=[]
+rang=[45,45]
 container = []
 # selection by name
-part=['PDAC-PGP20']
+part=[]
 #only plots no distances
 plotOnly=False
 # if plot at all
@@ -81,7 +81,7 @@ for d in data:
             continue
    elif rang:
       icount=icount+1
-      if icount < rang[0] or icount >= rang[1]:
+      if icount < rang[0] or icount > rang[1]:
          continue
    elif part:
       not_pass = True
@@ -112,9 +112,9 @@ for d in data:
       ymin = m2.min()
       ymax = m2.max()
       
-      if ymin > ymax:
-         print('strange things are going on')
-         ymin,ymax=ymax,ymin
+      # if ymin > ymax:
+      #    print('strange things are going on')
+      #    ymin,ymax=ymax,ymin
 
       ttannos = []
       annos=[]
@@ -163,12 +163,16 @@ for d in data:
          # check if an is disconnected
          remove_list=[]
          idx_list=[]
+         idx_listt=[]
          included_points=[]
+         included_pointst=[]
          size = len(annos)
+         org_anno=an
          if an[-1] == an[0]:
             subannos = [an]
          else:
             # remove duplicated points that appear in a row
+            # not sure if this is actually needed
             for ida,point in enumerate(an):
                if ida==0:
                   continue
@@ -176,48 +180,20 @@ for d in data:
                if ppoint == point:
                   remove_list.append(ida)
             an = [ele for i,ele in enumerate(an) if i not in remove_list]
-                
-            for point in an:
-               if an.count(point)==2 and point not in included_points:
 
-                  ids = [i for i, e in enumerate(an) if e == point]
-                  included_points.append(point)
-                  idx_list.append(ids)
-            if idx_list:               
-               exclude=[]
-               for ii in idx_list:
-                  for i in range(ii[0],ii[1]+1,1):
-                     exclude.append(i)
-
-               not_exclude=[]
-               not_idx_list = []
-               for ii in exclude:
-                  multi = exclude.count(ii)
-                  # focus on overlapping subannotations
-                  if multi > 1:
-                     for jj in idx_list:
-                        for ij in range(jj[0],jj[1]+1,1):
-                           if ij == ii:
-                              if jj not in not_idx_list:
-                                 not_idx_list.append(jj)
-               
-               for ii in not_idx_list:
-                  for i in range(ii[0],ii[1]+1,1):
-                     try:
-                        exclude.remove(i)
-                     except ValueError:
-                        pass                  
-                  idx_list.remove(ii)
-                                   
-               subannos = [an[i[0]:i[1]+1] for i in idx_list]
-
-               # add all the remaining points as one annotation
-               subann = [an[i] for i in range(len(an)) if i not in exclude]
-               subannos.append(subann)
-                        
-               # subannos = [an[i:j] for i,j in
-               #             zip([0] + idx_list, idx_list +
-               #                 ([size] if idx_list[-1] != size else []))]
+            foundone=False
+            ids = []
+            idx_list=[]
+            for idx,point in enumerate(an):
+               if idx==0 or foundone:
+                  istart   = point
+                  idxs     = idx
+                  foundone =False
+               if idxs!=idx and point==istart:
+                  foundone = True
+                  idx_list.append([idxs,idx])
+            if idx_list:
+               subannos = [an[i[0]:i[1]] for i in idx_list]
             else:
                subannos = [an]
          # # remove empty subannos
@@ -255,9 +231,6 @@ for d in data:
       print("Found " + str(nannos) + " tumor anno points.")
 
       outstr = []
-      # if ncells*nannos>(150000*150000) and nannos>150000:
-      #     useSimpleD = True
-      #     print("Using simple distances.")
       fout.write('# Used simple distance: '+str(useSimpleD)+'\n')
         
       for idxI,immuneCell in enumerate(immuneCells):
